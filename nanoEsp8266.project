@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeLite_Project Name="nanoEsp8266" Version="10.0.0" InternalType="Console">
+  <Plugins>
+    <Plugin Name="qmake">
+      <![CDATA[00010001N0005Debug000000000000]]>
+    </Plugin>
+  </Plugins>
+  <File Name="nanoEsp8266.mk"/>
+  <VirtualDirectory Name="components">
+    <VirtualDirectory Name="Mqtt">
+      <File Name="components/Mqtt/MqttWifi.cpp"/>
+      <File Name="components/Mqtt/MqttWifi.h"/>
+      <File Name="components/Mqtt/Wifi.cpp"/>
+      <File Name="components/Mqtt/Wifi.h"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="DWM1000">
+      <File Name="components/DWM1000/spi_register.h"/>
+      <File Name="components/DWM1000/deca_version.h"/>
+      <File Name="components/DWM1000/deca_types.h"/>
+      <File Name="components/DWM1000/deca_spi.h"/>
+      <File Name="components/DWM1000/deca_spi.c"/>
+      <File Name="components/DWM1000/deca_sleep.h"/>
+      <File Name="components/DWM1000/deca_sleep.c"/>
+      <File Name="components/DWM1000/deca_regs.h"/>
+      <File Name="components/DWM1000/deca_range_tables.c"/>
+      <File Name="components/DWM1000/deca_params_init.c"/>
+      <File Name="components/DWM1000/deca_param_types.h"/>
+      <File Name="components/DWM1000/deca_mutex.c"/>
+      <File Name="components/DWM1000/deca_device_api.h"/>
+      <File Name="components/DWM1000/deca_device.c"/>
+      <File Name="components/DWM1000/decaSpi.h"/>
+      <File Name="components/DWM1000/decaSpi.cpp"/>
+      <File Name="components/DWM1000/DWM1000_Tag.h"/>
+      <File Name="components/DWM1000/DWM1000_Tag.cpp"/>
+      <File Name="components/DWM1000/DWM1000_Message.h"/>
+      <File Name="components/DWM1000/DWM1000_Anchor.h"/>
+      <File Name="components/DWM1000/DWM1000_Anchor.cpp"/>
+      <File Name="components/DWM1000/DWM1000.h"/>
+      <File Name="components/DWM1000/DWM1000.cpp"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="Common">
+      <File Name="components/Common/pt.h"/>
+      <File Name="components/Common/pt-sem.h"/>
+      <File Name="components/Common/printf.h"/>
+      <File Name="components/Common/printf.c"/>
+      <File Name="components/Common/platform.h"/>
+      <File Name="components/Common/lc.h"/>
+      <File Name="components/Common/lc-switch.h"/>
+      <File Name="components/Common/lc-addrlabels.h"/>
+      <File Name="components/Common/jsmn.h"/>
+      <File Name="components/Common/jsmn.c"/>
+      <File Name="components/Common/XdrQueue.h"/>
+      <File Name="components/Common/XdrQueue.cpp"/>
+      <File Name="components/Common/Xdr.h"/>
+      <File Name="components/Common/Xdr.cpp"/>
+      <File Name="components/Common/Uid.h"/>
+      <File Name="components/Common/Uid.cpp"/>
+      <File Name="components/Common/Uart.h"/>
+      <File Name="components/Common/Timer.h"/>
+      <File Name="components/Common/Thread.h"/>
+      <File Name="components/Common/Sys.h"/>
+      <File Name="components/Common/Sys.cpp"/>
+      <File Name="components/Common/Strpack.h"/>
+      <File Name="components/Common/Strpack.cpp"/>
+      <File Name="components/Common/Str.h"/>
+      <File Name="components/Common/Str.cpp"/>
+      <File Name="components/Common/StaticLinkedList.hpp"/>
+      <File Name="components/Common/STM32_stubs.cpp"/>
+      <File Name="components/Common/RtosQueue.h"/>
+      <File Name="components/Common/RtosQueue.cpp"/>
+      <File Name="components/Common/QueueTemplate.h"/>
+      <File Name="components/Common/ProtoThread.h"/>
+      <File Name="components/Common/Prop.h"/>
+      <File Name="components/Common/Pool.h"/>
+      <File Name="components/Common/Packer.h"/>
+      <File Name="components/Common/PIC32_stubs.cpp"/>
+      <File Name="components/Common/Node.h"/>
+      <File Name="components/Common/Node.cpp"/>
+      <File Name="components/Common/Mutex.h"/>
+      <File Name="components/Common/Msgpack.h"/>
+      <File Name="components/Common/Msgpack.cpp"/>
+      <File Name="components/Common/Msg.h"/>
+      <File Name="components/Common/Logger.h"/>
+      <File Name="components/Common/Log.h"/>
+      <File Name="components/Common/Log.cpp"/>
+      <File Name="components/Common/LinkedList.hpp"/>
+      <File Name="components/Common/LinkedList.h"/>
+      <File Name="components/Common/LinkedList.cpp"/>
+      <File Name="components/Common/Link.h"/>
+      <File Name="components/Common/Json.h"/>
+      <File Name="components/Common/Json.cpp"/>
+      <File Name="components/Common/Interface.h"/>
+      <File Name="components/Common/Handler.h"/>
+      <File Name="components/Common/Flags.h"/>
+      <File Name="components/Common/EventSource.h"/>
+      <File Name="components/Common/EventSource.cpp"/>
+      <File Name="components/Common/Erc.h"/>
+      <File Name="components/Common/Config.h"/>
+      <File Name="components/Common/Config.cpp"/>
+      <File Name="components/Common/Common.cpp"/>
+      <File Name="components/Common/CircBuf.h"/>
+      <File Name="components/Common/CircBuf.cpp"/>
+      <File Name="components/Common/CborQueue.h"/>
+      <File Name="components/Common/CborQueue.cpp"/>
+      <File Name="components/Common/Cbor.h"/>
+      <File Name="components/Common/Bytes.h"/>
+      <File Name="components/Common/Bytes.cpp"/>
+      <File Name="components/Common/ByteStream.h"/>
+      <File Name="components/Common/BufferedByteStream.h"/>
+      <File Name="components/Common/BufferedByteStream.cpp"/>
+      <File Name="components/Common/Board.h"/>
+      <File Name="components/Common/Bits.h"/>
+      <File Name="components/Common/BipBuffer.h"/>
+      <File Name="components/Common/Base64.h"/>
+      <File Name="components/Common/Base64.cpp"/>
+    </VirtualDirectory>
+  </VirtualDirectory>
+  <VirtualDirectory Name="main">
+    <File Name="main/NanoAkka.cpp"/>
+    <File Name="main/component.mk"/>
+    <File Name="main/FreeRTOSConfig.h"/>
+    <File Name="main/main.cpp"/>
+    <File Name="main/Hardware.h"/>
+    <File Name="main/Hardware_ESP8266.cpp"/>
+  </VirtualDirectory>
+  <Reconciliation>
+    <Regexes/>
+    <Excludepaths>
+      <Path>build/</Path>
+    </Excludepaths>
+    <Ignorefiles/>
+    <Extensions>
+      <![CDATA[*.cpp;*.c;*.h;*.hpp;*.xrc;*.wxcp;*.fbp;*.Makefile;*.mk]]>
+    </Extensions>
+    <Topleveldir>/home/lieven/workspace/nanoEsp8266</Topleveldir>
+  </Reconciliation>
+  <Description/>
+  <Dependencies/>
+  <VirtualDirectory Name="src"/>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
+  <Settings Type="Executable">
+    <GlobalSettings>
+      <Compiler Options="" C_Options="" Assembler="">
+        <IncludePath Value="."/>
+      </Compiler>
+      <Linker Options="">
+        <LibraryPath Value="."/>
+      </Linker>
+      <ResourceCompiler Options=""/>
+    </GlobalSettings>
+    <Configuration Name="Debug" CompilerType="Cross GCC ( xtensa-lx106-elf )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-g;-O0;-Wall" C_Options="-g;-O0;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+        <IncludePath Value="."/>
+      </Compiler>
+      <Linker Options="" Required="yes"/>
+      <ResourceCompiler Options="" Required="no"/>
+      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
+      <BuildSystem Name="Default"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
+        <![CDATA[]]>
+      </Environment>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
+        <DebuggerSearchPaths/>
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild/>
+      <CustomBuild Enabled="yes">
+        <RebuildCommand/>
+        <CleanCommand>make clean</CleanCommand>
+        <BuildCommand>make</BuildCommand>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
+        <WorkingDirectory/>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+      <Completion EnableCpp11="no" EnableCpp14="no">
+        <ClangCmpFlagsC/>
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
+    </Configuration>
+    <Configuration Name="Release" CompilerType="Cross GCC ( xtensa-lx106-elf )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-O2;-Wall" C_Options="-O2;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+        <IncludePath Value="."/>
+        <Preprocessor Value="NDEBUG"/>
+      </Compiler>
+      <Linker Options="" Required="yes"/>
+      <ResourceCompiler Options="" Required="no"/>
+      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Release" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
+      <BuildSystem Name="Default"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
+        <![CDATA[]]>
+      </Environment>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
+        <DebuggerSearchPaths/>
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild/>
+      <CustomBuild Enabled="no">
+        <RebuildCommand/>
+        <CleanCommand/>
+        <BuildCommand/>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
+        <WorkingDirectory/>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+      <Completion EnableCpp11="no" EnableCpp14="no">
+        <ClangCmpFlagsC/>
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
+    </Configuration>
+  </Settings>
+</CodeLite_Project>
