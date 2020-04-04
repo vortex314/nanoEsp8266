@@ -7,11 +7,12 @@
 
 #ifndef DWM1000_H_
 #define DWM1000_H_
-#include <Akka.h>
+#include <NanoAkka.h>
 #include <Log.h>
 #include <Hardware.h>
 #include <DWM1000_Message.h>
 #include <Register.h>
+#include <Uid.h>
 
 extern "C" {
 
@@ -58,15 +59,18 @@ class Timeout
 public:
     uint32_t _interval;
     uint64_t _nextTimeout;
-    Timeout(uint32_t interval) {
+    Timeout(uint32_t interval)
+    {
         _interval = interval;
         _nextTimeout = UINT64_MAX;
     }
     void setInterval(uint32_t interval);
-    void reset() {
+    void reset()
+    {
         _nextTimeout = Sys::millis() + _interval;
     }
-    bool expired() {
+    bool expired()
+    {
         return Sys::millis() > _nextTimeout;
     };
 };
@@ -124,7 +128,8 @@ public:
     void createFinalMsg(FinalMsg& respMsg, RespMsg& pollMsg);
     bool isForMe(DwmMsg& dmwMsg);
     void tune();
-    uint8_t sequence() {
+    uint8_t sequence()
+    {
         return _sequence;
     }
     void status();

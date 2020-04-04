@@ -14,7 +14,7 @@ Mqtt_SRC_DIR =  $(Mqtt_ROOT)
 Mqtt_CFLAGS= -DESP_OPEN_RTOS 
 Mqtt_CXXFLAGS= -ffunction-sections -fdata-sections  -fno-threadsafe-statics -std=c++11 -fno-rtti -lstdc++ -fno-exceptions 
 Mqtt_CXXFLAGS += -DWIFI_PASS=${PSWD} -DWIFI_SSID=${SSID} -DESP_OPEN_RTOS
-Mqtt_INC_DIR= ../../main ../ArduinoJson/src ../nanoAkka/components/Wifi
+Mqtt_INC_DIR= ../../main ../ArduinoJson/src ../nanoAkka/components/wifi
 
 $(eval $(call component_compile_rules,Mqtt))
 

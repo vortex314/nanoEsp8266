@@ -5,15 +5,19 @@
       <![CDATA[00010001N0005Debug000000000000]]>
     </Plugin>
   </Plugins>
-  <File Name="nanoEsp8266.mk"/>
   <VirtualDirectory Name="components">
+    <File Name="components/component.mk"/>
     <VirtualDirectory Name="Mqtt">
+      <File Name="components/Mqtt/component.mk"/>
       <File Name="components/Mqtt/MqttWifi.cpp"/>
       <File Name="components/Mqtt/MqttWifi.h"/>
       <File Name="components/Mqtt/Wifi.cpp"/>
       <File Name="components/Mqtt/Wifi.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="DWM1000">
+      <File Name="components/DWM1000/component.mk"/>
+      <File Name="components/DWM1000/Register.h"/>
+      <File Name="components/DWM1000/Register.cpp"/>
       <File Name="components/DWM1000/spi_register.h"/>
       <File Name="components/DWM1000/deca_version.h"/>
       <File Name="components/DWM1000/deca_types.h"/>
@@ -39,6 +43,13 @@
       <File Name="components/DWM1000/DWM1000.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Common">
+      <File Name="components/Common/component.mk"/>
+      <File Name="components/Common/Sema.h"/>
+      <File Name="components/Common/Sema.cpp"/>
+      <File Name="components/Common/Register.h"/>
+      <File Name="components/Common/Register.cpp"/>
+      <File Name="components/Common/MedianFilter.h"/>
+      <File Name="components/Common/Common.mk"/>
       <File Name="components/Common/pt.h"/>
       <File Name="components/Common/pt-sem.h"/>
       <File Name="components/Common/printf.h"/>
@@ -64,7 +75,6 @@
       <File Name="components/Common/Strpack.cpp"/>
       <File Name="components/Common/Str.h"/>
       <File Name="components/Common/Str.cpp"/>
-      <File Name="components/Common/StaticLinkedList.hpp"/>
       <File Name="components/Common/STM32_stubs.cpp"/>
       <File Name="components/Common/RtosQueue.h"/>
       <File Name="components/Common/RtosQueue.cpp"/>
@@ -97,7 +107,6 @@
       <File Name="components/Common/Erc.h"/>
       <File Name="components/Common/Config.h"/>
       <File Name="components/Common/Config.cpp"/>
-      <File Name="components/Common/Common.cpp"/>
       <File Name="components/Common/CircBuf.h"/>
       <File Name="components/Common/CircBuf.cpp"/>
       <File Name="components/Common/CborQueue.h"/>
@@ -116,6 +125,8 @@
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="main">
+    <File Name="main/LedBlinker.h"/>
+    <File Name="main/LedBlinker.cpp"/>
     <File Name="main/NanoAkka.cpp"/>
     <File Name="main/component.mk"/>
     <File Name="main/FreeRTOSConfig.h"/>
@@ -170,7 +181,7 @@
       <CustomBuild Enabled="yes">
         <RebuildCommand/>
         <CleanCommand>make clean</CleanCommand>
-        <BuildCommand>make</BuildCommand>
+        <BuildCommand>make ANCHOR1</BuildCommand>
         <PreprocessFileCommand/>
         <SingleFileCommand/>
         <MakefileGenerationCommand/>

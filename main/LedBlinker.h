@@ -17,6 +17,7 @@ class LedBlinker : public Actor {
 		void init();
 		void delay(uint32_t d);
 		void onNext(const TimerMsg&);
+        void pulse();
 };
 
 #endif // LEDBLINKER_H

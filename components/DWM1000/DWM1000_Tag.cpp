@@ -8,7 +8,7 @@
 #include <DWM1000_Tag.h>
 #include <Log.h>
 #include <decaSpi.h>
-#include <System.h>
+#include <Sys.h>
 
 extern "C" {
 #include "deca_device_api.h"
@@ -81,6 +81,11 @@ static void final_msg_set_ts(uint8 *ts_field, uint64 ts);
 
 static uint32_t lastStatus = 0;
 static uint32_t lastEvent = 0;
+
+static Register reg_sys_status2("SYS_STATUS", "ICRBP HSRBP AFFREJ TXBERR HPDWARN RXSFDTO CLKPLL_LL RFPLL_LL "
+                                "SLP2INIT GPIOIRQ RXPTO RXOVRR F LDEERR RXRFTO RXRFSL RXFCE RXFCG "
+                                "RXDFR RXPHE RXPHD LDEDONE RXSFDD RXPRD TXFRS TXPHS TXPRS TXFRB AAT "
+                                "ESYNCR CPLOCK IRQSD");
 //_________________________________________________  IRQ Handler
 void tagInterruptHandler(void* obj)
 {
@@ -100,10 +105,25 @@ void DWM1000_Tag::txcallback(const dwt_callback_data_t* signal)
 //__________________________________________________
 DWM1000_Tag* DWM1000_Tag::_tag = 0;
 
-DWM1000_Tag::DWM1000_Tag(ActorRef& publisher, Spi& spi, DigitalIn& irq,
+DWM1000_Tag::DWM1000_Tag(Thread& thr, Spi& spi, DigitalIn& irq,
                          DigitalOut& reset, uint16_t shortAddress, uint8_t longAddress[6])
-    : _publisher(publisher), DWM1000(spi, irq, reset, shortAddress, longAddress), _irq(irq)
+    : Actor(thr),
+      DWM1000(spi, irq, reset, shortAddress, longAddress),
+      _irq(irq),
+      pollTimer(thr,1, 300,true),
+      expireTimer(thr,2,1000,true),
+      checkTimer(thr,3,5000,true),
+      logTimer(thr,4,1000,true),
+      polls(_polls),
+      resps(_resps),
+      blinks(_blinks),
+      finals(_finals),
+      errs(_errs),
+      missed(_missed),
+      timeouts(_timeouts),
+      interruptCount(_interrupts)
 {
+    INFO("ctor");
     _state = RCV_ANY;
     _count = 0;
     _interrupts = 0;
@@ -127,62 +147,51 @@ DWM1000_Tag::DWM1000_Tag(ActorRef& publisher, Spi& spi, DigitalIn& irq,
 
 DWM1000_Tag::~DWM1000_Tag()
 {
+    INFO("dtor");
 }
 
 void DWM1000_Tag::preStart()
 {
     INFO("DWM1000 TAG started.");
-    timers().startPeriodicTimer("poll", Msg("pollTimer"), 300);
-    timers().startPeriodicTimer("EXP", Msg("expireTimer"), 1000);
-    timers().startPeriodicTimer("check", Msg("checkTimer"), 5000);
-    timers().startPeriodicTimer("log", Msg("logTimer"), 1000);
 
+    wiring();
     _irq.onChange(DigitalIn::DIN_RAISE, tagInterruptHandler, this);
     DWM1000::setup();
     init();
 
 }
 
-static Register reg_sys_status2("SYS_STATUS", "ICRBP HSRBP AFFREJ TXBERR HPDWARN RXSFDTO CLKPLL_LL RFPLL_LL "
-                                "SLP2INIT GPIOIRQ RXPTO RXOVRR F LDEERR RXRFTO RXRFSL RXFCE RXFCG "
-                                "RXDFR RXPHE RXPHD LDEDONE RXSFDD RXPRD TXFRS TXPHS TXPRS TXFRB AAT "
-                                "ESYNCR CPLOCK IRQSD");
 
-Receive& DWM1000_Tag::createReceive()
+
+void DWM1000_Tag::wiring()
 {
-    return receiveBuilder().match(MsgClass::ReceiveTimeout(), [this](Msg& msg) {
-        INFO(" No more messages since some time ");
-    })
-
-    .match(LABEL("pollTimer"), [this](Msg& msg) {
+    INFO("");
+    pollTimer >> ([&](const TimerMsg& tm) {
         _pollTimerExpired=true;
-    })
-
-    .match(LABEL("logTimer"), [this](Msg& timerMsg) {
+    });
+    logTimer >> ([&](const TimerMsg& tm) {
         INFO("interr: %d TO:%d blink: %d poll: %d resp: %d final:%d anchors: %d delay:%d usec", _interrupts, _timeouts, _blinks, _polls, _resps, _finals, anchorsCount(), _interruptDelay);
-        Msg msg("PropertiesReply");
         for(int i=0; i< MAX_ANCHORS; i++) {
             if ( anchors[i]._address!=0) {
                 std::string topic;
-                string_format(topic,"anchors/%d/x",anchors[i]._address,anchors[i]._x);
-                msg(topic.c_str(),anchors[i]._x);
-                string_format(topic,"anchors/%d/y",anchors[i]._address,anchors[i]._y);
-                msg(topic.c_str(),anchors[i]._y);
-                string_format(topic,"anchors/%d/distance",anchors[i]._address,anchors[i]._distance);
-                msg(topic.c_str(),anchors[i]._distance);
+                std::string message;
+
+                string_format(topic,"anchors/%d",anchors[i]._address);
+                string_format(message,"{\"x\":%d,\"y\":%d,\"distance\":%d}",
+                              anchors[i]._x,
+                              anchors[i]._y,
+                              anchors[i]._distance);
+                mqttMsg.emit({topic,message});
             }
         }
-        _publisher.tell(msg,self());
         static uint32_t _oldBlinks=0;
         if ( _blinks > _oldBlinks) {
-            Msg msg(System::LedPulseOn);
-            msg.src(self().id());
-            eb.publish(msg);
+            blink=true;
         }
         _oldBlinks=_blinks;
-    })
+    });
 
-    .match(LABEL("checkTimer"), [this](Msg& msg) {
+    checkTimer >> ([&](const TimerMsg& tm) {
         static uint32_t oldInterrupts = 0;
         if (oldInterrupts == _interrupts) {
             INFO(" missing interrupts , lastEvent : %d lastStatus : 0x%X",lastEvent,lastStatus);
@@ -192,27 +201,11 @@ Receive& DWM1000_Tag::createReceive()
             enableRxd();
         }
         oldInterrupts = _interrupts;
-    })
+    });
 
-    .match(LABEL("expireTimer"), [this](Msg& msg) {
+    expireTimer >> ([&](const TimerMsg& tm) {
         expireAnchors();
-    })
-
-    .match(MsgClass::Properties(), [this](Msg& msg) {
-        std::string listAnchor;
-        listAnchors(listAnchor);
-        Msg& reply =
-            replyBuilder(msg)
-            ("interrupts", _interrupts)
-            ("polls", _polls)
-            ("responses", _resps)
-            ("finals", _finals)
-            ("blinks", _blinks)
-            ("interruptDelay", _interruptDelay)
-            ("errs", _errs)
-            ("missed", _missed);
-        sender().tell(reply,self());
-    }).build();
+    });
 }
 
 void DWM1000_Tag::init()
