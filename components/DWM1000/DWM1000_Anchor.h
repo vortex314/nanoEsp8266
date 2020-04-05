@@ -38,21 +38,22 @@ class DWM1000_Anchor: public Actor, public DWM1000
     bool _hasIrqEvent;
     float _distance;
     typedef enum {
-        RCV_ANY = H("RCV_ANY"),
-        RCV_POLL = H("RCV_POLL"),
-        RCV_FINAL = H("RCV_FINAL")
+        RCV_ANY,
+        RCV_POLL,
+        RCV_FINAL
     } State;
     State _state;
     bool _blinkTimerExpired;
     DigitalIn& _irq;
+    const char* stateString();
 
 public:
     TimerSource blinkTimer;
     TimerSource checkTimer;
     TimerSource logTimer;
+    TimerSource pulseTimer;
     ValueSource<bool> poll;
     ValueSource<MqttMessage> mqttMsg;
-    ValueSource<bool> blink;
     RefSource<uint32_t> polls;
     RefSource<uint32_t> blinks;
     RefSource<uint32_t> finals;
@@ -61,6 +62,7 @@ public:
     RefSource<uint32_t> timeouts;
     RefSource<uint32_t> interruptCount;
     RefSource<float> distanceRef;
+    ValueSource<uint16_t> address;
     static DWM1000_Anchor* _anchor;
     uint64_t _interruptStart;
     uint32_t _interrupts;

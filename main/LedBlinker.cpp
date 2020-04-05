@@ -14,6 +14,13 @@ LedBlinker::LedBlinker(Thread& thr,uint32_t pin, uint32_t delay)
         if ( flag ) blinkTimer.interval(500);
         else blinkTimer.interval(100);
     });
+    pulse.async(thread(),[&](const bool& b) {
+        blinkTimer.repeat(false);
+        blinkTimer.interval(100);
+        _ledGpio.write(0);
+        _on=1;
+        blinkTimer.start();
+    });
 }
 void LedBlinker::init()
 {
@@ -25,12 +32,4 @@ void LedBlinker::init()
 void LedBlinker::delay(uint32_t d)
 {
     blinkTimer.interval(d);
-}
-
-void LedBlinker::pulse()
-{
-    blinkTimer.repeat(false);
-    _ledGpio.write(0);
-    _on=1;
-    blinkTimer.start();
 }

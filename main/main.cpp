@@ -33,46 +33,6 @@ extern "C" void vApplicationMallocFailedHook()
 
 //______________________________________________________________________
 //
-class Pinger : public Actor
-{
-    int _counter=0;
-public:
-    ValueSource<int> out;
-    Sink<int,4> in;
-    Pinger(Thread& thr) : Actor(thr)
-    {
-        in.async(thread(),[&](const int& i) {
-            out=_counter++;
-        });
-    }
-    void start()
-    {
-        out=_counter++;
-    }
-};
-#define DELTA 50000
-class Echo : public Actor
-{
-    uint64_t _startTime;
-public:
-    ValueSource<int> msgPerMsec=0;
-    ValueSource<int> out;
-    Sink<int,4> in;
-    Echo(Thread& thr) : Actor(thr)
-    {
-        in.async(thread(),[&](const int& i) {
-            if ( i %DELTA == 0 ) {
-                uint64_t endTime=Sys::millis();
-                uint32_t delta = endTime - _startTime;
-                msgPerMsec = DELTA / delta;
-                INFO(" handled %lu messages in %u msec = %d msg/msec ",DELTA,delta,msgPerMsec());
-                vTaskDelay(10);
-                _startTime=Sys::millis();
-            }
-            out=i;
-        });
-    }
-};
 
 class Poller : public Actor,public Sink<TimerMsg,2>
 {
@@ -108,10 +68,8 @@ public:
 //------------------------------------------------------------------ actors and threads
 Thread mainThread("main");
 Thread mqttThread("mqtt");
-Pinger pinger(mainThread);
 Poller poller(mainThread);
-Echo echo(mainThread);
-LedBlinker ledBlue(mainThread,2,100);
+LedBlinker ledBlue(mainThread,2,UINT32_MAX);
 LedBlinker ledRed(mainThread,16,1000);
 Wifi wifi(mqttThread);
 MqttWifi mqtt(mqttThread);
@@ -154,9 +112,6 @@ extern "C" void user_init(void)
     INFO("%s : %s ",Sys::hostname(),systemBuild().c_str());
 
     INFO("Starting nanoAkka on %s heap : %d ", Sys::getProcessor(), Sys::getFreeHeap());
-//	pinger.out >> echo.in;
-    echo.out >> pinger.in;
-    pinger.start();
     ledBlue.init();
     ledRed.init();
     wifi.init();
@@ -177,17 +132,14 @@ extern "C" void user_init(void)
     wifi.ssid >> mqtt.toTopic<std::string>("wifi/ssid");
     wifi.rssi >> mqtt.toTopic<int>("wifi/rssi");
     poller(wifi.macAddress)(wifi.ipAddress)(wifi.ssid)(wifi.rssi);
+//------------------------------------------------------------------- console logging
 
-    echo.msgPerMsec >> mqtt.toTopic<int>("system/msgPerMsec");
-
-
-
-    TimerSource logTimer(mainThread,1,10000,true) ;
+    TimerSource& logTimer=*(new TimerSource(mainThread,1,10000,true)) ;
     logTimer >> ([](const TimerMsg& tm) {
         INFO(" ovfl : %u busyPop : %u busyPush : %u threadQovfl : %u  ",stats.bufferOverflow,stats.bufferPopBusy,stats.bufferPushBusy,stats.threadQueueOverflow);
     });
-    mainThread.start(); // wifi init fails if this doesn't end
-    mqttThread.start();
+//------------------------------------------------------------------- DWM1000
+
 #ifdef TAG
     DWM1000_Tag& tag=*(new DWM1000_Tag(mainThread,
                                        Spi::create(12,13,14,15),
@@ -206,14 +158,10 @@ extern "C" void user_init(void)
     tag.finals >> mqtt.toTopic<uint32_t>("tag/finals");
     tag.interruptCount >> mqtt.toTopic<uint32_t>("tag/interrupts");
     tag.errs >> mqtt.toTopic<uint32_t>("tag/errs");
-    tag.timeouts >> mqtt.topic<uint32_t>("tag/timeouts");
+    tag.timeouts >> mqtt.toTopic<uint32_t>("tag/timeouts");
     poller(tag.blinks)(tag.polls)(tag.resps)(tag.finals)(tag.interruptCount)(tag.errs)(tag.timeouts);
 
-    /*
-    std::string role;
-    } else if ( role.at(0)=='A'  ) {
-        ActorRef& anchor = actorSystem.actorOf<DWM1000_Anchor>("anchor",bridge,Spi::create(12,13,14,15),DigitalIn::create(4),DigitalOut::create(5),sdk_system_get_chip_id() & 0xFFFF,(uint8_t*)"GHIJKL");
-    }*/
+
 #endif
 #ifdef ANCHOR
     DWM1000_Anchor& anchor=*(new DWM1000_Anchor(mainThread,
@@ -221,20 +169,22 @@ extern "C" void user_init(void)
                              DigitalIn::create(4),
                              DigitalOut::create(5),
                              sdk_system_get_chip_id() & 0xFFFF,
-                             (uint8_t*)"ABCDEF"));
+                             (uint8_t*)S(ANCHOR)));
     anchor.preStart();
     anchor.mqttMsg >> mqtt.outgoing;
-    anchor.blink >> ([](const bool& b) {
-        ledBlue.pulse();
-    });
+    anchor.poll >> ledBlue.pulse;
     anchor.blinks >> mqtt.toTopic<uint32_t>("anchor/blinks");
     anchor.polls >> mqtt.toTopic<uint32_t>("anchor/polls");
     anchor.finals >> mqtt.toTopic<uint32_t>("anchor/finals");
     anchor.interruptCount >> mqtt.toTopic<uint32_t>("anchor/interrupts");
     anchor.errs >> mqtt.toTopic<uint32_t>("anchor/errs");
-    anchor.timeouts >> mqtt.topic<uint32_t>("anchor/timeouts");
-    anchor.distanceRef >> mqtt.topic<float>("anchor/distance");
-    poller(anchor.blinks)(anchor.polls)(anchor.finals)(anchor.interruptCount)(anchor.errs)(anchor.timeouts)(anchor.distanceRef);
+    anchor.timeouts >> mqtt.toTopic<uint32_t>("anchor/timeouts");
+    anchor.distanceRef >> mqtt.toTopic<float>("anchor/distance");
+    anchor.address >> mqtt.toTopic<uint16_t>("anchor/address");
+    poller(anchor.blinks)(anchor.polls)(anchor.finals)(anchor.interruptCount);
+    poller(anchor.errs)(anchor.timeouts)(anchor.distanceRef)(anchor.address);
 
 #endif
+    mainThread.start(); // wifi init fails if this doesn't end
+    mqttThread.start();
 }

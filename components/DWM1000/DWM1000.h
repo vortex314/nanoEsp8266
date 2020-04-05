@@ -12,7 +12,7 @@
 #include <Hardware.h>
 #include <DWM1000_Message.h>
 #include <Register.h>
-#include <Uid.h>
+//#include <Uid.h>
 
 extern "C" {
 
@@ -25,11 +25,11 @@ extern "C" {
 
 typedef void (*InterruptHandler)(void* instance);
 typedef enum {
-    FT_BLINK = H("FT_BLINK"),
-    FT_POLL = H("FT_POLL"),
-    FT_RESP = H("FT_RESP"),
-    FT_FINAL = H("FT_FINAL"),
-    FT_UNKNOWN = H("FT_UNKNOWN")
+    FT_BLINK,
+    FT_POLL,
+    FT_RESP,
+    FT_FINAL,
+    FT_UNKNOWN
 } FrameType;
 
 #define DWM_PIN_RESET D1
@@ -101,9 +101,9 @@ public:
     int32_t _x;             // abs pos in cm
     int32_t _y;
     uint32_t _distance;  // dist in cm
-    typedef enum  {
-        RCV_ANY = H("RCV_ANY"), RCV_RESP = H("SND_POLL")
-    } State;
+    /*   typedef enum  {
+           RCV_ANY, RCV_RESP
+       } State;*/
 
 
 public:

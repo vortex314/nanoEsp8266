@@ -95,20 +95,22 @@ class DWM1000_Tag: public Actor, public DWM1000
     std::string _panAddress;
 
     typedef enum {
-        RCV_ANY = H("RCV_ANY"),
-        RCV_RESP = H("RCV_RESP"),
-        RCV_FINAL = H("SND_FINAL")
+        RCV_ANY,
+        RCV_RESP,
+        RCV_FINAL
     } State;
     Anchor* _currentAnchor;
     State _state;
     bool _pollTimerExpired;
     DigitalIn& _irq;
+    const char* stateString();
 
 public:
     TimerSource pollTimer;
     TimerSource expireTimer;
     TimerSource checkTimer;
     TimerSource logTimer;
+     
     ValueSource<MqttMessage> mqttMsg;
     ValueSource<bool> blink;
     RefSource<uint32_t> polls;

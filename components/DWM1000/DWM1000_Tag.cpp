@@ -239,7 +239,7 @@ void DWM1000_Tag::diag(const char* msg)
     sys_mask = dwt_read32bitreg(SYS_MASK_ID);
     sys_status = dwt_read32bitreg(SYS_STATUS_ID);
     sys_state = dwt_read32bitreg(SYS_STATE_ID);
-    INFO(" %s SYS_MASK : %X SYS_STATUS : %X SYS_STATE: %X state : %s IRQ : %d", msg, sys_mask, sys_status, sys_state, Uid::label(_state), _irq
+    INFO(" %s SYS_MASK : %X SYS_STATUS : %X SYS_STATE: %X state : %s IRQ : %d", msg, sys_mask, sys_status, sys_state, stateString(), _irq
          .read());
 }
 
@@ -391,6 +391,15 @@ bool DWM1000_Tag::pollAnchor()
  * 					<===== ( x,y,distance )
  *
  */
+
+const char* DWM1000_Tag::stateString()
+{
+    return _state == RCV_ANY ? "RCV_ANY" :
+           ( _state== RCV_FINAL  ? "RCV_FINAL" :
+             ( _state== RCV_RESP ? "RCV_RESP" : "unknown state"));
+
+}
+
 void DWM1000_Tag::enableRxd()
 {
 //	dwt_setautorxreenable(true);
@@ -457,29 +466,29 @@ FrameType DWM1000_Tag::readMsg(const dwt_callback_data_t* signal)
         if (ft == FT_BLINK) {
             memcpy(_blinkMsg.buffer, _dwmMsg.buffer, sizeof(_blinkMsg));
             DEBUG_ISR(" blink %d : %d : %s", _blinkMsg.getSrc(), _blinkMsg
-                      .sequence, Uid::label(_state));
+                      .sequence, stateString());
             _blinks++;
         } else if (ft == FT_POLL) {
             memcpy(_pollMsg.buffer, _dwmMsg.buffer, sizeof(_pollMsg));
-            DEBUG_ISR(" poll %d : %d : %s", _pollMsg.getSrc(), _pollMsg.sequence, Uid::label(_state));
+            DEBUG_ISR(" poll %d : %d : %s", _pollMsg.getSrc(), _pollMsg.sequence, stateString());
             _polls++;
         } else if (ft == FT_RESP) {
             memcpy(_respMsg.buffer, _dwmMsg.buffer, sizeof(_respMsg));
             DEBUG_ISR(" resp %d : %d : %s ", _respMsg.getSrc(), _respMsg
-                      .sequence, Uid::label(_state));
+                      .sequence, stateString());
             _resps++;
         } else if (ft == FT_FINAL) {
             memcpy(_finalMsg.buffer, _dwmMsg.buffer, sizeof(_finalMsg));
             DEBUG_ISR(" final %d : %d : %s", _finalMsg.getSrc(), _finalMsg
-                      .sequence, Uid::label(_state));
+                      .sequence, stateString());
             _finals++;
         } else {
-            WARN_ISR(" unknown frame type %X:%X : %s", _dwmMsg.fc[0], _dwmMsg.fc[1], Uid::label(_state));
+            WARN_ISR(" unknown frame type %X:%X : %s", _dwmMsg.fc[0], _dwmMsg.fc[1], stateString());
         }
         return ft;
     } else {
         WARN_ISR("WARN invalid length %d : hdr %X:%X : %s", frameLength, _dwmMsg
-                 .fc[0], _dwmMsg.fc[1], Uid::label(_state));
+                 .fc[0], _dwmMsg.fc[1], stateString());
         return FT_UNKNOWN;
     }
 }

@@ -125,6 +125,8 @@
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="main">
+    <File Name="main/LogIsr.h"/>
+    <File Name="main/LogIsr.cpp"/>
     <File Name="main/LedBlinker.h"/>
     <File Name="main/LedBlinker.cpp"/>
     <File Name="main/NanoAkka.cpp"/>
