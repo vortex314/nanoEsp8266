@@ -85,11 +85,14 @@ LambdaSource<uint64_t> systemUptime([]()
 {
     return Sys::millis();
 });
+
 //-----------------------------------------------------------------------
 #include <DWM1000_Tag.h>
 #include <DWM1000_Anchor.h>
 extern "C" void user_init(void)
 {
+    std::string s;
+    s=host();
     uart_set_baud(0, 115200);
     sdk_system_update_cpu_freq(SYS_CPU_160MHZ); // need for speed, DWM1000 doesn't wait !
     Sys::init();
@@ -149,9 +152,7 @@ extern "C" void user_init(void)
                                        (uint8_t*)"ABCDEF"));
     tag.preStart();
     tag.mqttMsg >> mqtt.outgoing;
-    tag.blink >> ([](const bool& b) {
-        ledBlue.pulse();
-    });
+    tag.blink >> ledBlue.pulse;
     tag.blinks >> mqtt.toTopic<uint32_t>("tag/blinks");
     tag.polls >> mqtt.toTopic<uint32_t>("tag/polls");
     tag.resps >> mqtt.toTopic<uint32_t>("tag/resps");

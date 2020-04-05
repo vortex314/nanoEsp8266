@@ -207,6 +207,11 @@ void DWM1000_Anchor::wiring()
             poll=true;
         }
         _oldPolls=_polls;
+        static float oldDistance=0.0;
+        if ( _distance !=  oldDistance ) {
+            distanceRef=_distance; // force pub
+        }
+        oldDistance=_distance;
     });
 
     blinkTimer >> ([&](const TimerMsg& tm) {

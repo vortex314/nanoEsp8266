@@ -114,6 +114,7 @@ DWM1000_Tag::DWM1000_Tag(Thread& thr, Spi& spi, DigitalIn& irq,
       expireTimer(thr,2,1000,true),
       checkTimer(thr,3,5000,true),
       logTimer(thr,4,1000,true),
+      pulseTimer(thr,5,10,true),
       polls(_polls),
       resps(_resps),
       blinks(_blinks),
@@ -166,6 +167,13 @@ void DWM1000_Tag::preStart()
 void DWM1000_Tag::wiring()
 {
     INFO("");
+    pulseTimer >> ([&](const TimerMsg& tm) {
+        static uint32_t _oldBlinks=0;
+        if ( _blinks > _oldBlinks) {
+            blink=true;
+        }
+        _oldBlinks=_blinks;
+    });
     pollTimer >> ([&](const TimerMsg& tm) {
         _pollTimerExpired=true;
     });
@@ -184,11 +192,7 @@ void DWM1000_Tag::wiring()
                 mqttMsg.emit({topic,message});
             }
         }
-        static uint32_t _oldBlinks=0;
-        if ( _blinks > _oldBlinks) {
-            blink=true;
-        }
-        _oldBlinks=_blinks;
+
     });
 
     checkTimer >> ([&](const TimerMsg& tm) {

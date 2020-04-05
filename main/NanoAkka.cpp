@@ -22,7 +22,7 @@ void Thread::start()
 {
     xTaskCreate([](void* task) {
         ((Thread*)task)->run();
-    }, _name.c_str(), 3000, this, 17, NULL);
+    }, _name.c_str(), 1000, this, 17, NULL);
 }
 
 int Thread::enqueue(Invoker* invoker)

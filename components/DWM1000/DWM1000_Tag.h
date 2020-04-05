@@ -110,6 +110,8 @@ public:
     TimerSource expireTimer;
     TimerSource checkTimer;
     TimerSource logTimer;
+        TimerSource pulseTimer;
+
      
     ValueSource<MqttMessage> mqttMsg;
     ValueSource<bool> blink;
