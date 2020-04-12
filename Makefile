@@ -1,11 +1,11 @@
 PROGRAM=nanoEsp8266
 DEFINEK ?= -DAAAAA=BBBBBB
-EXTRA_COMPONENTS=components/DWM1000 components/Common components/Mqtt extras/sntp extras/mdnsresponder extras/rboot-ota extras/paho_mqtt_c 
+EXTRA_COMPONENTS=components/DWM1000 components/Common components/Mqtt components/config extras/sntp extras/mdnsresponder extras/rboot-ota extras/paho_mqtt_c  
 PROGRAM_SRC_DIR=. main
 
 PROGRAM_INC_DIR=. main ../nanoAkka/components/wifi ../nanoAkka/main ../esp-open-rtos/include 
 PROGRAM_INC_DIR +=../esp-open-rtos/core/include ../esp-open-sdk/lx106-hal/include ../Common  
-PROGRAM_INC_DIR +=../ArduinoJson/src ../DWM1000 $(ROOT)bootloader $(ROOT)bootloader/rboot 
+PROGRAM_INC_DIR +=../ArduinoJson/src ../DWM1000 components/config $(ROOT)bootloader $(ROOT)bootloader/rboot 
 
 PROGRAM_CXXFLAGS += -g -ffunction-sections -fdata-sections -fno-threadsafe-statics 
 PROGRAM_CXXFLAGS += -std=c++11 -fno-rtti -lstdc++ -fno-exceptions 

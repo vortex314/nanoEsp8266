@@ -6,6 +6,11 @@
     </Plugin>
   </Plugins>
   <VirtualDirectory Name="components">
+    <VirtualDirectory Name="config">
+      <File Name="components/config/component.mk"/>
+      <File Name="components/config/ConfigFlow.h"/>
+      <File Name="components/config/ConfigFlow.cpp"/>
+    </VirtualDirectory>
     <File Name="components/component.mk"/>
     <VirtualDirectory Name="Mqtt">
       <File Name="components/Mqtt/component.mk"/>
@@ -43,6 +48,8 @@
       <File Name="components/DWM1000/DWM1000.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Common">
+      <File Name="components/Common/StaticLinkedList.hpp"/>
+      <File Name="components/Common/Common.cpp"/>
       <File Name="components/Common/component.mk"/>
       <File Name="components/Common/Sema.h"/>
       <File Name="components/Common/Sema.cpp"/>
@@ -183,7 +190,7 @@
       <CustomBuild Enabled="yes">
         <RebuildCommand/>
         <CleanCommand>make clean</CleanCommand>
-        <BuildCommand>make TAG1</BuildCommand>
+        <BuildCommand>make </BuildCommand>
         <PreprocessFileCommand/>
         <SingleFileCommand/>
         <MakefileGenerationCommand/>
