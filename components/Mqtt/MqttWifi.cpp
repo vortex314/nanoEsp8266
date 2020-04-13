@@ -24,12 +24,13 @@ enum {
 MqttWifi* MqttWifi::_mqttWifi = 0;
 
 
-MqttWifi::MqttWifi(Thread& thr) : Mqtt(thr),_yieldTimer(thr,1,200,true) {
+MqttWifi::MqttWifi(Thread& thread) : Mqtt(thread),_yieldTimer(thread,1,100,true) {
 //	_address = va_arg(args, const char*);
 	_address = MQTT_HOST;
 	wifiConnected.on(false);
 	connected = false;
 	_mqttWifi = this;
+	incoming.async(thread);
 }
 
 void MqttWifi::init() {
@@ -59,7 +60,7 @@ void MqttWifi::init() {
 
 	_yieldTimer >> ([&](const TimerMsg& tm) {
 		if(connected()) {
-			int ret = mqtt_yield(&_client, 0);
+			int ret = mqtt_yield(&_client, 10); // this should be called regularly
 			if(ret == MQTT_DISCONNECTED) {
 				mqttDisconnect();
 				mqttConnect();
@@ -72,22 +73,14 @@ void MqttWifi::init() {
 }
 
 void MqttWifi::topic_received_cb(mqtt_message_data_t* md) {
-	static bool busy = false;
-	INFO("");
-	if (!busy) {
-		mqtt_message_t* message = md->message;
-		std::string topic((char*) md->topic->lenstring.data, (uint32_t) md
-		                  ->topic->lenstring.len);
-		std::string data((char*) (message->payload), (uint32_t) message
-		                 ->payloadlen);
-		INFO(" topic received %s:%s ",topic.c_str(),data.c_str());
-
-		busy = true;
-		_mqttWifi->incoming.on({topic,data});
-		busy = false;
-	} else {
-		WARN(" sorry ! MQTT reception busy ");
-	}
+	mqtt_message_t* message = md->message;
+	std::string topic((char*) md->topic->lenstring.data, (uint32_t) md
+	                  ->topic->lenstring.len);
+	std::string data((char*) (message->payload), (uint32_t) message
+	                 ->payloadlen);
+	INFO(" topic received %s:%s ",topic.c_str(),data.c_str());
+	topic = topic.substr(_mqttWifi->_hostPrefix.length());
+	_mqttWifi->incoming.on({topic,data});
 }
 
 void MqttWifi::mqttPublish(const std::string& topic,const std::string& msg) {

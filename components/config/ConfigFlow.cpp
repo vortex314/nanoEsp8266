@@ -17,6 +17,8 @@ bool ConfigStore::loadAll() {
 	if (_loaded) {
 		return true;
 	}
+//	sysparam_set_data("config",(uint8_t*)"{}",3,false);
+
 	sysparam_status_t status;
 	uint32_t base_addr, num_sectors;
 
@@ -31,9 +33,10 @@ bool ConfigStore::loadAll() {
 	size_t actual_length;
 	bool is_binary;
 	status = sysparam_get_data("config", &destPtr, &actual_length, &is_binary);
+	INFO("sysparam_get_data %s:%d",destPtr,actual_length);
 	char* _charBuffer=(char*)(malloc(1000));
 	if (status == SYSPARAM_OK) {
-		strncpy(_charBuffer,(char*)destPtr,sizeof(_charBuffer));
+		strncpy(_charBuffer,(char*)destPtr,actual_length);
 		free(destPtr);
 	} else {
 		ERROR("sysparam_get_data('config',...) fails : %d ",status);
@@ -53,24 +56,22 @@ bool ConfigStore::loadAll() {
 		deserializeJson(jsonDoc,"{}");
 		saveAll();
 	}
-//    char buffer[1024];
-	serializeJson(jsonDoc, _charBuffer, sizeof(_charBuffer));
-	INFO(" config loaded : %s",_charBuffer);
+	std::string buffer;
+	serializeJson(jsonDoc, buffer);
+	INFO(" config loaded : %s",buffer.c_str());
 	free(_charBuffer);
 	return true;
 }
 
 bool ConfigStore::saveAll() {
-	char* _charBuffer=(char*)(malloc(1000));
-	serializeJson(jsonDoc, _charBuffer, sizeof(_charBuffer));
-	sysparam_status_t status = sysparam_set_string("config", _charBuffer);
+	std::string buffer;
+	serializeJson(jsonDoc,buffer);
+	sysparam_status_t status = sysparam_set_string("config", buffer.c_str());
 	if ( status == SYSPARAM_OK) {
-		INFO(" config saved : %s ", _charBuffer);
-		free(_charBuffer);
+		INFO(" config saved : %s ", buffer.c_str());
 		return true;
 	} else {
 		ERROR("config save failed : %d ",status);
-		free(_charBuffer);
 		return false;
 	}
 }

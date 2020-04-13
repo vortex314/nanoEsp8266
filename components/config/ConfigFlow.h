@@ -5,11 +5,7 @@
 #define ARDUINOJSON_ENABLE_STD_STRING 1
 #include <ArduinoJson.h>
 class ConfigStore {
-		static void initialize();
-		static void initMagic();
-		static bool checkMagic();
 		static bool _loaded;
-
 	public:
 		static StaticJsonDocument<1024> jsonDoc;
 		static bool saveAll();
@@ -36,6 +32,7 @@ template <class T> class ConfigFlow : public Flow<T, T>, public ConfigStore  {
 
 		void on(const T &value) {
 			_value = value;
+//			INFO(" key : %s",_name.c_str());
 			jsonDoc[_name]=value;
 			saveAll();
 			request();
