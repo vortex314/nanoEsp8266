@@ -194,7 +194,7 @@ static Register reg_sys_status2("SYS_STATUS", "ICRBP HSRBP AFFREJ TXBERR HPDWARN
 void DWM1000_Anchor::wiring()
 {
     logTimer >> ([&](const TimerMsg& tm) {
-        INFO(" interr: %d TO:%d blink: %d poll: %d resp: %d final: %d dist: %f delay: %d usec", _interrupts, _timeouts, _blinks, _polls, _resps, _finals, _distance, _interruptDelay);
+        INFO(" int: %d to:%d blk: %d pol: %d rsp: %d fin: %d dist: %.1f delay: %d usec", _interrupts, _timeouts, _blinks, _polls, _resps, _finals, _distance, _interruptDelay);
         std::string topic="anchor/poller";
         std::string message;
         string_format(message,"%u:%u",_pollMsg.getSrc(),_pollMsg.getDst());

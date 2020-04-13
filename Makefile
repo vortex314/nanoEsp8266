@@ -32,6 +32,18 @@ TAG1 :
 ANCHOR1 :
 	touch main/main.cpp
 	make DEFINEK=" -DANCHOR=AAA001 -DHOSTNAME=anchor1"
+ANCHOR2 :
+	touch main/main.cpp
+	make DEFINEK=" -DANCHOR=AAA002 -DHOSTNAME=anchor2"
+ANCHOR3 :
+	touch main/main.cpp
+	make DEFINEK=" -DANCHOR=AAA003 -DHOSTNAME=anchor3"
+ANCHOR4 :
+	touch main/main.cpp
+	make DEFINEK=" -DANCHOR=AAA004 -DHOSTNAME=anchor4"
+ANCHOR5 :
+	touch main/main.cpp
+	make DEFINEK=" -DANCHOR=AAA005 -DHOSTNAME=anchor5"
 
 term:
 	rm -f $(TTY)_minicom.log

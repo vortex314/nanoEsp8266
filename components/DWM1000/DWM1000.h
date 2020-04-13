@@ -8,6 +8,7 @@
 #ifndef DWM1000_H_
 #define DWM1000_H_
 #include <NanoAkka.h>
+#include <ConfigFlow.h>
 #include <Log.h>
 #include <Hardware.h>
 #include <DWM1000_Message.h>
@@ -98,15 +99,16 @@ public:
     uint8_t _dataRate;
     uint8_t _pacSize;
     uint8_t _sequence;
-    int32_t _x;             // abs pos in cm
-    int32_t _y;
-    uint32_t _distance;  // dist in cm
+    uint32_t _distance;
+    // dist in cm
     /*   typedef enum  {
            RCV_ANY, RCV_RESP
        } State;*/
 
 
 public:
+    ConfigFlow<int32_t> x;
+    ConfigFlow<int32_t> y;
     DWM1000(Spi& spi,DigitalIn& irq,DigitalOut& reset,uint16_t shortAddress,uint8_t* longAddress);
     virtual ~DWM1000();
     void mode(uint32_t m);

@@ -46,7 +46,7 @@ const static struct {
 
 DWM1000::DWM1000(Spi& spi, DigitalIn& irq, DigitalOut& reset,
                  uint16_t shortAddress, uint8_t* longAddress)
-    : _spi(spi), _irq(irq), _reset(reset)
+    : _spi(spi), _irq(irq), _reset(reset),x("DWM1000/x",0),y("DWM1000/y",0)
 {
     _shortAddress = shortAddress;
     memcpy(_longAddress, longAddress, 6);
@@ -70,8 +70,7 @@ DWM1000::DWM1000(Spi& spi, DigitalIn& irq, DigitalOut& reset,
         (1025+64-32) /* SFD timeout (preamble length + 1 + SFD length - PAC size). Used in RX only. */ // changed due to above was (1025+64-32)
     };
     _distance = 0.0;
-    _x = 0;
-    _y = 0;
+
     _count = 0;
 }
 
@@ -156,6 +155,9 @@ extern void dwt_isr();
 
 void DWM1000::init()
 {
+    volatile int32_t a;
+    a=x();
+    a=y();
     resetChip();
 
     spi_set_rate_low();
@@ -223,8 +225,6 @@ void DWM1000::setup()
     	Uid("RCV_RESP");
     	Uid("SND_FINAL");*/
     config.setNameSpace("dwm1000");
-    config.get("x", _x, 1000);
-    config.get("y", _y, 2000);
 //_________________________________________________INIT SPI, IRQ,RESET  DWM1000
     spi_set_global(&_spi); // to support deca spi routines, to handle also irq's
     _spi.setClock(Spi::SPI_CLOCK_500K);
@@ -262,8 +262,8 @@ void DWM1000::createBlinkFrame(BlinkMsg& blink)
     blink.sequence = _sequence++;
     for (int i = 0; i < 8; i++)
         blink.sourceLong[i] = _longAddress[7 - i];
-    little_endian(blink.x, _x);
-    little_endian(blink.y, _y);
+    little_endian(blink.x, x());
+    little_endian(blink.y, y());
     little_endian(blink.distance, _distance);
 }
 
