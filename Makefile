@@ -45,6 +45,10 @@ ANCHOR5 :
 	touch main/main.cpp
 	make DEFINEK=" -DANCHOR=AAA005 -DHOSTNAME=anchor5"
 
+TREESHAKER:
+	touch main/main.cpp
+	make DEFINEK=" -DTREESHAKER -DHOSTNAME=treeshaker"
+
 term:
 	rm -f $(TTY)_minicom.log
 	minicom -D $(SERIAL_PORT) -b $(SERIAL_BAUD) -C $(TTY)_minicom.log
