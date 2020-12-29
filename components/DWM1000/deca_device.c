@@ -16,7 +16,6 @@
 #include "deca_device_api.h"
 #include "deca_sleep.h"
 
-#include "common_macros.h"
 // #include "port.h"
 
 // Defines for enable_clocks function
@@ -2214,8 +2213,9 @@ uint8 dwt_checkIRQ(void)
  *
  * no return value
  */
+#include <esp_attr.h>
 #define ICACHE_RAM_ATTR  __attribute__((section(".iram.text")))
-IRAM void dwt_isr(void) // Assume interrupt can supply context
+IRAM_ATTR void dwt_isr(void) // Assume interrupt can supply context
 {
     uint32  status = 0;
     uint32  clear = 0; // Will clear any events seen

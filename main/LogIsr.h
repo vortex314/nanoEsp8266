@@ -7,15 +7,15 @@
 
 #ifndef MAIN_LOGISR_H_
 #define MAIN_LOGISR_H_
-#include <NanoAkka.h>
-#include <CircBuf.h>
+#include <limero.h>
+#include <deque>
 #include <Log.h>
 #include <stdlib.h>
 #include <stdio.h>
 
 class LogIsr: public Actor
 {
-    CircBuf _buffer;
+    std::deque<char> _buffer;
     char _strBuffer[256];
     static LogIsr* _me;
 public:

@@ -3,25 +3,27 @@
         {
             "name": "ESP8266",
             "includePath": [
+                "/home/lieven/esp/ESP8266_RTOS_SDK/components/**",
+                "/home/lieven/esp/ESP8266_RTOS_SDK/components/freertos/include/**",
                 "${workspaceFolder}/main",
                 "${workspaceFolder}/components/**",
-                "${workspaceFolder}/../esp-open-rtos/*",
-                "${workspaceFolder}/../nanoAkka/**",
+                "${workspaceFolder}/../limero/**",
                 "${workspaceFolder}/../Common/",
-                "${workspaceFolder}/../ArduinoJson/src/",
-                "../esp-open-sdk/lx106-hal/include",
-                "../esp-open-rtos/**"
+                "${workspaceFolder}/../ArduinoJson/src/"
             ],
             "defines": [
                 "FREERTOS",
                 "MQTT_HOST=limero.ddns.net",
-                "MQTT_PORT=1883"
+                "MQTT_PORT=1883",
+                "ESP8266_RTOS_SDK",
+                "ANCHOR1"
             ],
             "compilerPath": "/usr/bin/clang",
             "cStandard": "c11",
             "cppStandard": "c++17",
             "intelliSenseMode": "clang-x64",
-            "forcedInclude": []
+            "forcedInclude": [],
+            "compileCommands": "${workspaceFolder}/build/compile_commands.json"
         }
     ],
     "version": 4

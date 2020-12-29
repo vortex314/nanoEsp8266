@@ -1,0 +1,1 @@
+idf_component_register(SRCS "main.cpp" "NanoAkka.cpp" "LogIsr.cpp" "LedBlinker.cpp" "Hardware_ESP8266.cpp" INCLUDE_DIRS "" REQUIRE "freertos")

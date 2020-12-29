@@ -1,11 +1,11 @@
 #include <cstring>
 #include <stdio.h>
-#include <FreeRTOS.h>
-#include <esp/uart.h>
-#include <espressif/esp_system.h>
-#include <task.h>
-#include <NanoAkka.h>
-
+//#include <esp/uart.h>
+//#include <espressif/esp_system.h>
+#include <limero.h>
+#include <LedBlinker.h>
+#include <Wifi.h>
+#include <MqttWifi.h>
 #define GENERIC
 //#define DWM1000
 
@@ -16,7 +16,7 @@
  * Returns      : none
  *******************************************************************************/
 
-Log logger(256);
+Log logger(512);
 
 void vAssertCalled(unsigned long ulLine, const char *const pcFileName)
 {
@@ -25,7 +25,7 @@ void vAssertCalled(unsigned long ulLine, const char *const pcFileName)
 
 extern "C" void vApplicationMallocFailedHook()
 {
-    WARN(" malloc failed ! ");
+    printf(" malloc failed ! ");
     while (1)
         ;
 }
@@ -42,7 +42,7 @@ class Poller : public Actor, public Sink<TimerMsg, 2>
 
 public:
     Sink<bool, 2> connected;
-    Poller(Thread &t) : Actor(t), _pollInterval(t, 1, 1000, true)
+    Poller(Thread &t) : Actor(t), _pollInterval(t, 1000, true, "poller")
     {
         _pollInterval >> this;
         connected.async(thread(), [&](const bool &b) {
@@ -63,9 +63,7 @@ public:
         return *this;
     }
 };
-#include <LedBlinker.h>
-#include <Wifi.h>
-#include <MqttWifi.h>
+
 //------------------------------------------------------------------ actors and threads
 Thread mainThread("main");
 Thread mqttThread("mqtt");
@@ -76,17 +74,18 @@ Wifi wifi(mqttThread);
 MqttWifi mqtt(mqttThread);
 #ifdef TREESHAKER
 #include <ConfigFlow.h>
-ConfigFlow<int> shakeTime("shaker/shakeTime",3000);
+ConfigFlow<int> shakeTime("shaker/shakeTime", 3000);
 DigitalOut &triacPin = DigitalOut::create(15);
-TimerSource shakeTimer(mainThread, 1, 2000, false);
+TimerSource shakeTimer(mainThread, 2000, false);
 ValueFlow<bool> triacOn(false);
 #endif
 //------------------------------------------------------------------ system props
 ValueSource<std::string> systemBuild("NOT SET");
 ValueSource<std::string> systemHostname("NOT SET");
 ValueSource<bool> systemAlive = true;
+#include <FreeRTOS.h>
 LambdaSource<uint32_t> systemHeap([]() {
-    return xPortGetFreeHeapSize();
+    return esp_get_free_heap_size();
 });
 LambdaSource<uint64_t> systemUptime([]() {
     return Sys::millis();
@@ -95,15 +94,28 @@ LambdaSource<uint64_t> systemUptime([]() {
 #include <ConfigFlow.h>
 ConfigFlow<std::string> configHost("system/host", "unknown");
 ConfigFlow<float> configFloat("system/float", 3.141592653);
+TimerSource delayTimer(mainThread,6000,false);
+uint32_t getMac32()
+{
+    union
+    {
+        uint8_t macBytes[6];
+        uint64_t macInt;
+    };
+    macInt = 0L;
+    esp_efuse_mac_get_default(macBytes);
+    return macInt;
+}
 
 //-----------------------------------------------------------------------
 #include <DWM1000_Tag.h>
 #include <DWM1000_Anchor.h>
-extern "C" void user_init(void)
+#include <driver/uart.h>
+extern "C" void app_main(void)
 {
-    uart_set_baud(0, 115200);
+    uart_set_baudrate(UART_NUM_0, 115200);
 #if defined(ANCHOR) || defined(TAG)
-    sdk_system_update_cpu_freq(SYS_CPU_160MHZ); // need for speed, DWM1000 doesn't wait !
+    esp_set_cpu_freq(ESP_CPU_FREQ_160M); // need for speed, DWM1000 doesn't wait !
 #endif
     Sys::init();
     std::string conf;
@@ -112,19 +124,10 @@ extern "C" void user_init(void)
     Sys::hostname(S(HOSTNAME));
 #else
     std::string hn;
-    union {
-        uint8_t macBytes[6];
-        uint64_t macInt;
-    };
-    macInt = 0L;
-    if (sdk_wifi_get_macaddr(STATION_IF, macBytes) != true)
-        WARN(" esp_base_mac_addr_get() failed.");
-    ;
-    string_format(hn, "ESP82-%d", macInt & 0xFFFF);
+    string_format(hn, "ESP82-%d", getMac32() & 0xFFFF);
     Sys::hostname(hn.c_str());
 #endif
     systemHostname = Sys::hostname();
-    ;
     systemBuild = __DATE__ " " __TIME__;
     INFO("%s : %s ", Sys::hostname(), systemBuild().c_str());
 
@@ -151,7 +154,7 @@ extern "C" void user_init(void)
     poller(wifi.macAddress)(wifi.ipAddress)(wifi.ssid)(wifi.rssi);
     //------------------------------------------------------------------- console logging
 
-    TimerSource &logTimer = *(new TimerSource(mainThread, 1, 10000, true));
+    TimerSource &logTimer = *(new TimerSource(mainThread, 10000, true));
     logTimer >> ([](const TimerMsg &tm) {
         INFO(" ovfl : %u busyPop : %u busyPush : %u threadQovfl : %u  ", stats.bufferOverflow, stats.bufferPopBusy, stats.bufferPushBusy, stats.threadQueueOverflow);
     });
@@ -166,7 +169,7 @@ extern "C" void user_init(void)
     mqtt.topic<bool>("shaker/shake") == triacOn;
     triacOn >> [](const bool &b) { triacPin.write(b?1:0);if(b) shakeTimer.start(); };
     shakeTimer >> [](const TimerMsg &tm) { triacOn.on(false);shakeTimer.stop(); };
-    shakeTime >> [](const int& t){ if(t>0)  shakeTimer.interval(t);};
+    shakeTime >> [](const int &t) { if(t>0)  shakeTimer.interval(t); };
     poller(triacOn)(shakeTime);
 #endif
 #ifdef TAG
@@ -174,7 +177,7 @@ extern "C" void user_init(void)
                                          Spi::create(12, 13, 14, 15),
                                          DigitalIn::create(4),
                                          DigitalOut::create(5),
-                                         sdk_system_get_chip_id() & 0xFFFF,
+                                         getMac32() & 0xFFFF,
                                          (uint8_t *)"ABCDEF"));
     tag.preStart();
     tag.mqttMsg >> mqtt.outgoing;
@@ -194,9 +197,10 @@ extern "C" void user_init(void)
                                                   Spi::create(12, 13, 14, 15),
                                                   DigitalIn::create(4),
                                                   DigitalOut::create(5),
-                                                  sdk_system_get_chip_id() & 0xFFFF,
+                                                  getMac32() & 0xFFFF,
                                                   (uint8_t *)S(ANCHOR)));
-    anchor.preStart();
+    delayTimer >> [&](const TimerMsg& tm ){ anchor.preStart();};
+    delayTimer.start();
     anchor.mqttMsg >> mqtt.outgoing;
     anchor.poll >> ledBlue.pulse;
     anchor.x == mqtt.topic<int32_t>("anchor/x");

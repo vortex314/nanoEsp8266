@@ -45,14 +45,14 @@ int openspi(/*SPI_TypeDef* SPIx*/)
 /*! ------------------------------------------------------------------------------------------------------------------
  * Function: closespi()
  *
- * Low level abstract function to close the the SPI device.
+ * Low level abstract fisrunction to close the the SPI device.
  * returns 0 for success, or -1 for error
  */
 int closespi(void)
 {
-	while (port_SPIx_busy_sending()); //wait for tx buffer to empty
+/*	while (port_SPIx_busy_sending()); //wait for tx buffer to empty
 
-	port_SPIx_disable();
+	port_SPIx_disable();*/
 
 	return 0;
 

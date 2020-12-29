@@ -13,7 +13,8 @@
 
 #include "deca_sleep.h"
 //#include "port.h"
-#include "Sys.h"
+#include <stdint.h>
+extern uint64_t SysMillis();
 void deca_sleep(unsigned int time_ms)
 {
     /* This assumes that the tick has a period of exactly one millisecond. See CLOCKS_PER_SEC define. */

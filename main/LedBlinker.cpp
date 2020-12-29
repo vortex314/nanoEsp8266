@@ -2,7 +2,7 @@
 
 
 LedBlinker::LedBlinker(Thread& thr,uint32_t pin, uint32_t delay)
-    : Actor(thr),_ledGpio(DigitalOut::create(pin)),blinkTimer(thr,BLINK_TIMER_ID,delay,true)
+    : Actor(thr),_ledGpio(DigitalOut::create(pin)),blinkTimer(thr,delay,true)
 {
 
     blinkTimer >> ([&](const TimerMsg tm) {

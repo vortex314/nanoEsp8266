@@ -86,6 +86,7 @@ void DWM1000::resetChip()
     _reset.write(0);
     Sys::delay(10);
     _reset.write(1);
+    INFO("exit");
 }
 
 Register reg_sys_status("SYS_STATUS", "ICRBP HSRBP AFFREJ TXBERR HPDWARN RXSFDTO CLKPLL_LL RFPLL_LL "
@@ -159,7 +160,6 @@ void DWM1000::init()
     a=x();
     a=y();
     resetChip();
-
     spi_set_rate_low();
     dwt_setpanid(0xDECA);
     dwt_setaddress16(_shortAddress);
@@ -167,10 +167,8 @@ void DWM1000::init()
 //    dwt_setpanid(0xDECA);
 //    dwt_setaddress16(((uint16_t)'E'<<8)+'V');
     std::string strAddress;
-
     dwt_seteui(_longAddress);
     dwt_geteui(_longAddress);
-
     INFO(" EUID = %X:%X:%X:%X:%X:%X", _longAddress[0], _longAddress[1], _longAddress[2], _longAddress[3], _longAddress[4], _longAddress[5]);
 
 //  dwt_softreset();

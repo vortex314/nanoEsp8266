@@ -110,11 +110,11 @@ DWM1000_Tag::DWM1000_Tag(Thread& thr, Spi& spi, DigitalIn& irq,
     : Actor(thr),
       DWM1000(spi, irq, reset, shortAddress, longAddress),
       _irq(irq),
-      pollTimer(thr,1, 300,true),
-      expireTimer(thr,2,1000,true),
-      checkTimer(thr,3,5000,true),
-      logTimer(thr,4,1000,true),
-      pulseTimer(thr,5,10,true),
+      pollTimer(thr,300,true),
+      expireTimer(thr,1000,true),
+      checkTimer(thr,5000,true),
+      logTimer(thr,1000,true),
+      pulseTimer(thr,10,true),
       polls(_polls),
       resps(_resps),
       blinks(_blinks),
@@ -361,7 +361,8 @@ bool DWM1000_Tag::pollAnchor()
 {
 //    INFO(" anchors : %d in %d ",_anchorIndex,anchors.size());
     for (int i = 0; i < MAX_ANCHORS; i++) {
-        _anchorIndex = ++_anchorIndex % MAX_ANCHORS;
+        _anchorIndex++;
+        _anchorIndex = _anchorIndex % MAX_ANCHORS;
         if (anchors[_anchorIndex]._address != 0) {
             break;
         }
@@ -380,7 +381,7 @@ bool DWM1000_Tag::pollAnchor()
     }
     return true;
 }
-#include <pt.h>
+//#include <pt.h>
 /**
  * FSM for handling reception
  * in receive state : wait for data or timeout

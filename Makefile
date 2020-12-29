@@ -1,29 +1,23 @@
-PROGRAM=nanoEsp8266
+PROJECT_NAME := limeroEsp8266
 DEFINEK ?= -DAAAAA=BBBBBB
-EXTRA_COMPONENTS=components/DWM1000 components/Common components/Mqtt components/config extras/sntp extras/mdnsresponder extras/rboot-ota extras/paho_mqtt_c  
-PROGRAM_SRC_DIR=. main
+IDF_PATH =$(HOME)/esp/ESP8266_RTOS_SDK
+LIMERO = $(HOME)/workspace/limero
+EXTRA_COMPONENT_DIRS = $(LIMERO)/esp8266_rtos_sdk $(LIMERO)/limero DWM1000 $(LIMERO)/common
 
-PROGRAM_INC_DIR=. main ../nanoAkka/components/wifi ../nanoAkka/main ../esp-open-rtos/include 
-PROGRAM_INC_DIR +=../esp-open-rtos/core/include ../esp-open-sdk/lx106-hal/include ../Common  
-PROGRAM_INC_DIR +=../ArduinoJson/src ../DWM1000 components/config $(ROOT)bootloader $(ROOT)bootloader/rboot 
+CXXFLAGS += -g -ffunction-sections -fdata-sections -fno-threadsafe-statics 
+CXXFLAGS += -std=c++11 -fno-rtti -lstdc++ -fno-exceptions 
+CXXFLAGS += -DWIFI_PASS=${PSWD} -DWIFI_SSID=${SSID} $(DEFINEK) -DESP8266_RTOS_SDK
+CXXFLAGS += -DMQTT_HOST="limero.ddns.net" -DMQTT_PORT=1883
+CXXFLAGS += -I $(LIMERO)/inc -I$(HOME)/workspace/ArduinoJson/src
 
-PROGRAM_CXXFLAGS += -g -ffunction-sections -fdata-sections -fno-threadsafe-statics 
-PROGRAM_CXXFLAGS += -std=c++11 -fno-rtti -lstdc++ -fno-exceptions 
-PROGRAM_CXXFLAGS += -DWIFI_PASS=${PSWD} -DWIFI_SSID=${SSID} $(DEFINEK) -DESP_OPEN_RTOS 
-
-PROGRAM_LDFLAGS = -Wl,--gc-sections
 
 ESPBAUD=921600
 TTY ?= USB0
 SERIAL_PORT ?= /dev/tty$(TTY)
 ESPPORT = $(SERIAL_PORT)
 SERIAL_BAUD = 115200
-# LIBS= m hal gcc stdc++ atomic
-LIBS= m  gcc stdc++ 
 
-EXTRA_CFLAGS=-DEXTRAS_MDNS_RESPONDER -DLWIP_MDNS_RESPONDER=1 -DLWIP_NUM_NETIF_CLIENT_DATA=1 -DLWIP_NETIF_EXT_STATUS_CALLBACK=1 
-# FLAVOR=sdklike
-include ../esp-open-rtos/common.mk
+include $(IDF_PATH)/make/project.mk
 
 TAG1 :
 	touch main/main.cpp

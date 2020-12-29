@@ -9,7 +9,7 @@
 #define FC_2_SHORT 0x88
 
 typedef  union {
-    uint8_t buffer[];
+    uint8_t buffer[26];
     struct {
         uint8_t fc[1];
         uint8_t sequence;
@@ -28,7 +28,7 @@ typedef  union {
 
 
 typedef  union {
-    uint8_t buffer[];
+    uint8_t buffer[12];
     struct {
         uint8_t fc[2];
         uint8_t sequence;
@@ -47,7 +47,7 @@ typedef  union {
 } __attribute__ ((packed)) PollMsg ;
 
 typedef  union {
-    uint8_t buffer[];
+    uint8_t buffer[15];
     struct {
         uint8_t fc[2];
         uint8_t sequence;
@@ -68,7 +68,7 @@ typedef  union {
 } __attribute__ ((packed)) RespMsg ;
 
 typedef  union {
-    uint8_t buffer[];
+    uint8_t buffer[24];
     struct {
         uint8_t fc[2];
         uint8_t sequence;
@@ -90,7 +90,7 @@ typedef  union {
 } __attribute__ ((packed)) FinalMsg ;
 
 typedef union {
-    uint8_t buffer[];
+    uint8_t buffer[sizeof(BlinkMsg)];
     BlinkMsg blinkMsg;
     FinalMsg finalMsg;
     PollMsg pollMsg;

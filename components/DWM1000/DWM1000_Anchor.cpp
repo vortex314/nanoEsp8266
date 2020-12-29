@@ -93,8 +93,9 @@ const char* DWM1000_Anchor::stateString()
 
 }
 DWM1000_Anchor* DWM1000_Anchor::_anchor;
-
-void anchorInterruptHandler(void* obj)
+#include <FreeRTOS.h>
+#include <esp_attr.h>
+IRAM_ATTR void anchorInterruptHandler(void* obj)
 {
     DWM1000_Anchor::_anchor->_interruptStart = Sys::micros();
     DWM1000_Anchor::_anchor->_interrupts++;
@@ -116,10 +117,10 @@ DWM1000_Anchor::DWM1000_Anchor(Thread& thr, Spi& spi, DigitalIn& irq,
                                DigitalOut& reset, uint16_t shortAddress, uint8_t longAddress[6])
     : Actor(thr),
       DWM1000(spi, irq, reset, shortAddress, longAddress), _irq(irq),
-      blinkTimer(thr,1, 1000,true),
-      checkTimer(thr,3,5000,true),
-      logTimer(thr,4,1000,true),
-      pulseTimer(thr,5,10,true),
+      blinkTimer(thr, 1000,true),
+      checkTimer(thr,5000,true),
+      logTimer(thr,1000,true),
+      pulseTimer(thr,10,true),
       polls(_polls),
       blinks(_blinks),
       finals(_finals),
